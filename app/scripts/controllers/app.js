@@ -55,9 +55,12 @@ define([
             this.doAction(data, params);
         },
         onChangeEffect: function (data) {
-            var params = {effect: data.effect};
+            var _this = this,
+                params = {effect: data.effect};
 
-            this.doAction(data, params);
+            this.doAction(data, {on: true}).done(function () {
+                _this.doAction(data, params);
+            });
         },
         doAction: function (data, params) {
             switch (data.type) {
