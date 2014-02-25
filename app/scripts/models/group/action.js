@@ -10,6 +10,11 @@ define([
     var GroupActionModel = Backbone.Model.extend({
         url: function () {
             return modelHelper.urlRoot + '/' + modelHelper.username + '/groups/' + this.id + '/action';
+        },
+        doAction: function (params, options) {
+            return this.save(null, _.extend({}, options, {
+                data: JSON.stringify(params)
+            }));
         }
     });
 
