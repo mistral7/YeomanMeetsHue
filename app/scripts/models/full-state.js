@@ -7,11 +7,11 @@ define([
 ], function (modelHelper, _, Backbone) {
     'use strict';
 
-    var ConfigModel = Backbone.Model.extend({
+    var FullStateModel = Backbone.Model.extend({
         url: function () {
-            return modelHelper.urlRoot + '/' + modelHelper.username + '/config';
+            return modelHelper.urlRoot + '/' + modelHelper.username;
         }
     });
 
-    return ConfigModel;
+    return FullStateModel;
 });
