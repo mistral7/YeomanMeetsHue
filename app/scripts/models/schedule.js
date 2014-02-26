@@ -8,7 +8,9 @@ define([
     'use strict';
 
     var ScheduleModel = Backbone.Model.extend({
-        urlRoot: modelHelper.urlRoot + '/' + modelHelper.username + '/schedules'
+        urlRoot: function () {
+            return modelHelper.urlRoot + '/' + modelHelper.username + '/schedules';
+        }
     });
 
     return ScheduleModel;

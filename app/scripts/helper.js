@@ -5,6 +5,22 @@ define([
 ], function (modelHelper) {
     'use strict';
 
+    var rgbToHex = function(rgb) {
+        rgb = rgb.match(/^rgb\((\d+),\s*(\d+),\s*(\d+)\)$/);
+        function hex(x) {
+            return ("0" + parseInt(x).toString(16)).slice(-2);
+        }
+        return "#" + hex(rgb[1]) + hex(rgb[2]) + hex(rgb[3]);
+    };
+
+    var hexToRgb = function (code) {
+        return {
+            r: parseInt(code.slice(1,3), 16),
+            g: parseInt(code.slice(3,5), 16),
+            b: parseInt(code.slice(5,7), 16)
+        }
+    };
+
     /**
      * RGB配列 を HSV配列 へ変換します
      *
@@ -14,7 +30,7 @@ define([
      * @param   {Boolean} coneModel 円錐モデルにするか
      * @return  {Object}  {h, s, v} ※ h は 0～360の数値、s/v は 0～255 の数値
      */
-    function RGBtoHSV (r, g, b, coneModel) {
+    var rgbToHsv = function (r, g, b, coneModel) {
         var h, // 0..360
             s, v, // 0..255
             max = Math.max(Math.max(r, g), b),
@@ -49,7 +65,7 @@ define([
         v = max;
 
         return {'h': h, 's': s, 'v': v};
-    }
+    };
     /**
      * HSV配列 を RGB配列 へ変換します
      *
@@ -58,7 +74,7 @@ define([
      * @param   {Number}  v         value値      ※ 0～255 の数値
      * @return  {Object}  {r, g, b} ※ r/g/b は 0～255 の数値
      */
-    function HSVtoRGB (h, s, v) {
+    var hsvToRgb = function (h, s, v) {
         var r, g, b; // 0..255
 
         while (h < 0) {
@@ -98,9 +114,15 @@ define([
         }
 
         return {'r': Math.round(r), 'g': Math.round(g), 'b': Math.round(b)};
-    }
+    };
 
     var helper = {
+        color: {
+            rgbToHex: rgbToHex,
+            hexToRgb: hexToRgb,
+            rgbToHsv: rgbToHsv,
+            hsvToRgb: hsvToRgb
+        },
         model: modelHelper
     };
     return helper;

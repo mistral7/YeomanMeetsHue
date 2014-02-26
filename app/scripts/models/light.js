@@ -8,7 +8,9 @@ define([
     'use strict';
 
     var LightModel = Backbone.Model.extend({
-        urlRoot: modelHelper.urlRoot + '/' + modelHelper.username + '/lights'
+        urlRoot: function () {
+            return modelHelper.urlRoot + '/' + modelHelper.username + '/lights';
+        }
     });
 
     return LightModel;

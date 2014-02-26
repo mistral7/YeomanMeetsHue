@@ -9,7 +9,9 @@ define([
     'use strict';
 
     var GroupCollection = Backbone.Collection.extend({
-        url: modelHelper.urlRoot + '/' + modelHelper.username + '/groups',
+        url: function () {
+            return modelHelper.urlRoot + '/' + modelHelper.username + '/groups'
+        },
         parse: function (ret) {
             return _.map(ret, function (group, idx) {
                 return _.extend({}, group, {id: parseInt(idx, 10)});

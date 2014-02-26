@@ -29,7 +29,8 @@ require.config({
         modernizr: '../bower_components/modernizr/modernizr',
         requirejs: '../bower_components/requirejs/require',
         'sass-bootstrap': '../bower_components/sass-bootstrap/dist/js/bootstrap',
-        fastclick: '../bower_components/fastclick/lib/fastclick'
+        fastclick: '../bower_components/fastclick/lib/fastclick',
+        moment: '../bower_components/moment/moment'
     }
 });
 
@@ -46,10 +47,17 @@ require([
     $(function() {
         FastClick.attach(document.body);
     });
-    discoverModel.fetch()
-        .done(function () {
-            helper.model.urlRoot = 'http://' + discoverModel.get('internalipaddress') + '/api';
-            new AppRouter();
-            Backbone.history.start();
-        });
+
+    if (helper.model.urlRoot.match(/\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}/)[0] === '1.1.1.1') {
+        discoverModel.fetch()
+            .done(function () {
+                helper.model.urlRoot = 'http://' + discoverModel.get('internalipaddress') + '/api';
+                new AppRouter();
+                Backbone.history.start();
+            });
+    } else {
+        helper.model.urlRoot = 'http://' + discoverModel.get('internalipaddress') + '/api';
+        new AppRouter();
+        Backbone.history.start();
+    }
 });

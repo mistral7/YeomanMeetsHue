@@ -9,7 +9,9 @@ define([
     'use strict';
 
     var ScheduleCollection = Backbone.Collection.extend({
-        url: modelHelper.urlRoot + '/' + modelHelper.username + '/schedules',
+        url: function () {
+            return modelHelper.urlRoot + '/' + modelHelper.username + '/schedules'
+        },
         parse: function (ret) {
             return _.map(ret, function (schedule, idx) {
                 return _.extend({}, schedule, {id: parseInt(idx, 10)});

@@ -7,10 +7,22 @@ $fa-font-path: "../fonts";
 @import 'flat_colors';
 @import 'colors';
 
+body {
+  background-color: #F0F1EB;
+}
+
 header {
   .navbar {
     a {
       color: #ffffff;
+    }
+  }
+  .lights-state {
+    background-color: #fff;
+    margin: 5px 0;
+    padding: 6px;
+    .light {
+      margin: 0 5px;
     }
   }
 }
@@ -21,4 +33,10 @@ header {
   margin-top: 70px;
   font-size: 2em;
   text-align: center;
+}
+.lights {
+  margin: 20px 0 0;
+  i.fa {
+    margin: 0 3px;
+  }
 }

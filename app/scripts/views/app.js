@@ -4,17 +4,10 @@ define([
     'jquery',
     'underscore',
     'backbone',
-    'templates'
-], function ($, _, Backbone, JST) {
+    'templates',
+    'helper'
+], function ($, _, Backbone, JST, helper) {
     'use strict';
-
-    var rgb2hex = function(rgb) {
-        rgb = rgb.match(/^rgb\((\d+),\s*(\d+),\s*(\d+)\)$/);
-        function hex(x) {
-            return ("0" + parseInt(x).toString(16)).slice(-2);
-        }
-        return "#" + hex(rgb[1]) + hex(rgb[2]) + hex(rgb[3]);
-    }
 
     var AppView = Backbone.View.extend({
         template: JST['app/scripts/templates/app.ejs'],
@@ -36,7 +29,8 @@ define([
         },
         onClickColorsButton: function (ev) {
             this.trigger('changeColor', _.extend({}, this.getSelectedLight(), {
-                color: rgb2hex($(ev.currentTarget).find('label').css('background-color'))
+                color: $(ev.currentTarget).data('color'),
+                hex: helper.color.rgbToHex($(ev.currentTarget).find('label').css('background-color'))
             }));
         },
         onClickAlertsButton: function (ev) {

@@ -8,7 +8,9 @@ define([
     'use strict';
 
     var GroupModel = Backbone.Model.extend({
-        urlRoot: modelHelper.urlRoot + '/' + modelHelper.username + '/groups'
+        urlRoot: function () {
+            return modelHelper.urlRoot + '/' + modelHelper.username + '/groups';
+        }
     });
 
     return GroupModel;
