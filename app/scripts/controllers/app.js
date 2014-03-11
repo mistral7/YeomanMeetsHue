@@ -32,7 +32,6 @@ define([
             yellow: {r: 46, g: 254, b: 4},
             green: {r: 2, g: 201, b: 68},
             blue: {r: 78, g: 2, b: 254},
-//                cyan: '',
             purple: {r: 176, g: 13, b: 201}
         },
         initialize: function () {
@@ -56,6 +55,8 @@ define([
             this.listenTo(this.appView, 'changeColor', this.onChangeColor);
             this.listenTo(this.appView, 'changeAlert', this.onChangeAlert);
             this.listenTo(this.appView, 'changeEffect', this.onChangeEffect);
+            this.listenTo(this.appView, 'clearSchedule', this.onClearSchedule);
+            this.listenTo(this.appView, 'ltStart', this.onLtStart);
         },
         route: function () {
             var _this = this;
@@ -65,11 +66,8 @@ define([
             this.fullStateModel.fetch();
             this.timer = setInterval(function () {
                 _this.fullStateModel.fetch();
+                _this.calculateTimer();
             }, 500);
-
-            this.sched();
-//            this.sched1();
-            this.sched2();
         },
         onChangeConfigState: function () {
             var config = this.fullStateModel.get('config'),
@@ -84,7 +82,7 @@ define([
                 light2Rgb = helper.color.hsvToRgb(Math.floor(((lights[2].state.hue * 360) / 65535)), lights[2].state.sat, lights[2].state.bri),
                 light3Rgb = helper.color.hsvToRgb(Math.floor(((lights[3].state.hue * 360) / 65535)), lights[3].state.sat, lights[3].state.bri),
                 convert = function (rgb) {
-                    return 'rgb('+rgb.r+','+rgb.g+','+rgb.b+')';
+                    return 'rgb(' + rgb.r + ',' + rgb.g + ',' + rgb.b + ')';
                 };
 
             $('.lights-state .light-1').css('color', lights[1].state.on ? convert(light1Rgb) : '#dddddd');
@@ -96,40 +94,12 @@ define([
 
             this.doAction(data, params);
         },
-//        onChangeColor: function (data) {
-//            var _this = this,
-//                rgb = helper.color.hexToRgb(data.color),
-//                hsv = helper.color.rgbToHsv(rgb.r, rgb.g, rgb.b, false),
-//                params = {
-//                    hue: Math.floor((hsv.h * 65535) / 360),
-//                    sat: Math.floor(hsv.s),
-//                    bri: Math.floor(hsv.v)
-//                };
-//            console.log(rgb);
-//
-//            this.doAction(data, {on: true}).done(function () {
-//                _this.doAction(data, params);
-//            });
-//        },
         onChangeColor: function (data) {
             var _this = this;
 
             this.doAction(data, {on: true}).done(function () {
                 _this.doAction(data, _this.generateHsvParams(data.color));
             });
-        },
-        generateHsvParams: function (color) {
-            var colors = this.colors,
-//                rgb = helper.color.hexToRgb(data.hex),
-                rgb = colors[color],
-                hsv = helper.color.rgbToHsv(rgb.r, rgb.g, rgb.b, false),
-                params = {
-                    hue: Math.floor((hsv.h * 65535) / 360),
-                    sat: Math.floor(hsv.s),
-                    bri: Math.floor(hsv.v)
-                };
-
-            return params;
         },
         onChangeAlert: function (data) {
             var params = {alert: data.alert};
@@ -144,6 +114,21 @@ define([
                 _this.doAction(data, params);
             });
         },
+        onClearSchedule: function () {
+            var schedules = this.fullStateModel.get('schedules'),
+                __scheduleModel;
+
+            this.target = null;
+
+            _.each(schedules, function (schedule, key) {
+                __scheduleModel = new ScheduleModel({id: key});
+                __scheduleModel.destroy();
+            });
+        },
+        onLtStart: function () {
+            this.startLt(2);
+        },
+        // Functions
         doAction: function (data, params) {
             switch (data.type) {
             case 'single':
@@ -154,46 +139,46 @@ define([
                 break;
             }
         },
-        sched: function () {
-            var params = {
-                'name': 'Wake up',
-                'description': 'My wake up alarm',
+        generateHsvParams: function (color) {
+            var colors = this.colors,
+                rgb = colors[color],
+                hsv = helper.color.rgbToHsv(rgb.r, rgb.g, rgb.b, false),
+                params = {
+                    hue: Math.floor((hsv.h * 65535) / 360),
+                    sat: Math.floor(hsv.s),
+                    bri: Math.floor(hsv.v)
+                };
+
+            return params;
+        },
+        startLt: function (min) {
+            var baseParams = {
+                    'name': 'Start LT',
+                    'description': 'Desc',
+                    'command': null,
+                    'time': null
+                },
+                before1minOnModel  = new ScheduleModel(),
+                before1minOffModel  = new ScheduleModel(),
+                timeUpOnModel  = new ScheduleModel(),
+                timeUpAlertModel  = new ScheduleModel(),
+                now = moment().add('ms', this.diff),
+                target = this.target = now.clone().add('m', min);
+
+            before1minOnModel.save(_.extend({}, baseParams, {
                 'command': {
                     'address': this.group1ActionModel.url().match(/\/api.*/)[0],
                     'method': 'PUT',
-                    'body': _.extend({}, {on: true, transitiontime: 5}, this.generateHsvParams('orange'))
+                    'body': _.extend({}, {
+                        on: true,
+                        transitiontime: 5
+                        },
+                        this.generateHsvParams('orange')
+                    )
                 },
-                'time': moment().add('ms', this.diff).add('s', 5).toISOString().slice(0,19)
-            };
-            var sched = new ScheduleModel();
-            return sched.save(params, {wait: true})
-                .done(function () {
-                    console.log('Schedule registered.');
-                });
-        },
-        sched1: function () {
-            var params = {
-                'name': 'Wake up',
-                'description': 'My wake up alarm',
-                'command': {
-                    'address': this.group1ActionModel.url().match(/\/api.*/)[0],
-                    'method': 'PUT',
-                    'body': {
-                        'alert': 'select'
-                    }
-                },
-                'time': moment().add('ms', this.diff).add('s', 6).toISOString().slice(0,19)
-            };
-            var sched = new ScheduleModel();
-            sched.save(params, {wait: true})
-                .done(function () {
-                    console.log('Schedule registered.');
-                });
-        },
-        sched2: function () {
-            var params = {
-                'name': 'Wake up',
-                'description': 'My wake up alarm',
+                'time': target.clone().subtract('s', 30).toISOString().slice(0, 19)
+            }));
+            before1minOffModel.save(_.extend({}, baseParams, {
                 'command': {
                     'address': this.group1ActionModel.url().match(/\/api.*/)[0],
                     'method': 'PUT',
@@ -202,13 +187,37 @@ define([
                         transitiontime: 5
                     }
                 },
-                'time': moment().add('ms', this.diff).add('s', 6).toISOString().slice(0,19)
-            };
-            var sched = new ScheduleModel();
-            sched.save(params, {wait: true})
-                .done(function () {
-                    console.log('Schedule registered.');
-                });
+                'time':  target.clone().subtract('s', 30).add('s', 1).toISOString().slice(0, 19)
+            }));
+            timeUpOnModel.save(_.extend({}, baseParams, {
+                'command': {
+                    'address': this.group1ActionModel.url().match(/\/api.*/)[0],
+                    'method': 'PUT',
+                    'body': _.extend({}, {
+                            on: true,
+                            transitiontime: 5
+                        },
+                        this.generateHsvParams('red')
+                    )
+                },
+                'time':  target.clone().toISOString().slice(0,19)
+            }));
+            timeUpAlertModel.save(_.extend({}, baseParams, {
+                'command': {
+                    'address': this.group1ActionModel.url().match(/\/api.*/)[0],
+                    'method': 'PUT',
+                    'body': {
+                        alert: 'lselect'
+                    }
+                },
+                'time': target.clone().add('s', 1).toISOString().slice(0, 19)
+            }));
+        },
+        calculateTimer: function () {
+            var min = Math.floor((this.target - moment()) / 1000 / 60),
+                sec = Math.floor((this.target - moment()) / 1000 % 60);
+
+            this.appView.setTimeReaming(min, sec);
         }
     });
 

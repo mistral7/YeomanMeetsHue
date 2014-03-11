@@ -56,7 +56,6 @@ require([
                 Backbone.history.start();
             });
     } else {
-        helper.model.urlRoot = 'http://' + discoverModel.get('internalipaddress') + '/api';
         new AppRouter();
         Backbone.history.start();
     }

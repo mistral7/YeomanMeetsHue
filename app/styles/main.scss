@@ -4,7 +4,6 @@ $fa-font-path: "../fonts";
 @import 'sass-bootstrap/lib/bootstrap';
 @import 'font-awesome/scss/font-awesome';
 
-@import 'flat_colors';
 @import 'colors';
 
 body {
@@ -13,6 +12,7 @@ body {
 
 header {
   .navbar {
+    background: #16A085;
     a {
       color: #ffffff;
     }
@@ -39,4 +39,10 @@ header {
   i.fa {
     margin: 0 3px;
   }
+}
+.time-reaming {
+  display: inline-block;
+  margin: 0 10px;
+  font-size: 24px;
+  vertical-align: middle;
 }

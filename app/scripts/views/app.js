@@ -15,7 +15,9 @@ define([
             'click .onoff button': 'onClickOnoffButton',
             'click .colors button': 'onClickColorsButton',
             'click .alerts button': 'onClickAlertsButton',
-            'click .effects button': 'onClickEffectsButton'
+            'click .effects button': 'onClickEffectsButton',
+            'click .clear-schedule': 'onClickClearSchedule',
+            'click .lt-start': 'onClickLtStart'
         },
         render: function () {
             this.$el.html(this.template());
@@ -47,6 +49,23 @@ define([
             var domValue = this.$('.lights .active input[name=lights]').val().split('-');
 
             return {type: domValue[0], index: domValue[1]};
+        },
+        onClickClearSchedule: function () {
+            this.trigger('clearSchedule');
+        },
+        onClickLtStart: function () {
+            this.trigger('ltStart');
+        },
+        setTimeReaming: function (min, sec) {
+            var renderTime;
+
+            if (_.isNaN(min) || sec < 0) {
+                renderTime = '00:00';
+                this.$('.time-reaming').text(renderTime).removeClass('text-danger');
+            } else {
+                renderTime = ('00' + min).slice(-2) + ':' + ('00' + sec).slice(-2);
+                this.$('.time-reaming').text(renderTime).toggleClass('text-danger', min < 1);
+            }
         }
     });
 
